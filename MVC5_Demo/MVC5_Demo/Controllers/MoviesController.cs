@@ -17,7 +17,7 @@ namespace MVC5_Demo.Controllers
         private MovieDbContext db = new MovieDbContext();
 
         // GET: Movies
-        public async Task<ActionResult> Index(string searchString)
+        public async Task<ActionResult> Index(string searchString, string movieGenre)
         {
             IQueryable<Movie> movieQuery = db.Movies;
 
@@ -25,6 +25,14 @@ namespace MVC5_Demo.Controllers
             {
                 movieQuery = movieQuery.Where(m => m.Title.Contains(searchString));
             }
+            if (!string.IsNullOrWhiteSpace(movieGenre))
+            {
+                movieQuery = movieQuery.Where(m => m.Genre == movieGenre);
+            }
+
+            ViewBag.movieGenre = new SelectList(db.Movies.Select(m => m.Genre)
+                                                         .OrderBy(g => g)
+                                                         .Distinct());
 
             return View(await movieQuery.ToListAsync());
         }
